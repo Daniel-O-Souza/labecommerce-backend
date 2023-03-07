@@ -1,0 +1,22 @@
+{
+  "name": "labecommerce-backend",
+  "version": "1.0.0",
+  "description": "Projeto backend para o curso de desenvolvedor fullstack da labenu",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "tsc && node ./build/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Daniel-O-Souza/labecommerce-backend.git"
+  },
+  "keywords": [],
+  "author": "Daniel de Oliveira Souza",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Daniel-O-Souza/labecommerce-backend/issues"
+  },
+  "homepage": "https://github.com/Daniel-O-Souza/labecommerce-backend#readme"
+}
