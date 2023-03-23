@@ -1,4 +1,4 @@
-export type TUser = {
+export type TUsers = {
     id: string,
     email:string,
     password: string
@@ -10,14 +10,14 @@ export enum CATEGORY {
     ELECTRONICS = "Eletrônicos"
 }
 
-export type TProduct = {
+export type TProducts = {
     id: string,
     name: string,
     price: number,
     category: CATEGORY
 }
 
-export type TPurchase = {
+export type TPurchases = {
     userId: string,
     productId: string,
     quantity: number,

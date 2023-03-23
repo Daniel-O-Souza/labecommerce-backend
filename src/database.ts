@@ -1,6 +1,6 @@
-import { TUser, TProduct, TPurchase, CATEGORY } from "./types";
+import { TUsers, TProducts, TPurchases, CATEGORY } from "./types";
 
-export const user: TUser[] = [
+export const users: TUsers[] = [
     {
         id: "Daniel",
         email: "daniel@email.com",
@@ -14,18 +14,18 @@ export const user: TUser[] = [
 
 export function createUser(id: string, email: string, password: string) {
 
-    const newUser: TUser = { id, email, password }
+    const newUser: TUsers = { id, email, password }
 
-    user.push(newUser)
+    users.push(newUser)
 
     console.log("Usuário cadastrado com sucesso")
 }
 
 export function getAllUsers(): void {
-    console.table(user)
+    console.table(users)
 }
 
-export const product: TProduct[] = [
+export const products: TProducts[] = [
     {
         id: "0101",
         name: "Camiseta",
@@ -41,9 +41,9 @@ export const product: TProduct[] = [
 
 export function createProduct(id: string, name: string, price: number, category: CATEGORY) {
 
-    const newProduct: TProduct = { id, name, price, category }
+    const newProduct: TProducts = { id, name, price, category }
 
-    product.push(newProduct)
+    products.push(newProduct)
 
     console.log("Produto cadastrado com sucesso")
 
@@ -51,25 +51,25 @@ export function createProduct(id: string, name: string, price: number, category:
 
 export function getAllProducts(): void {
 
-    console.table(product)
+    console.table(products)
 
 }
 
-export function queryProductsByName(q: string): TProduct[] {
+export function queryProductsByName(q: string): TProducts[] {
 
-    return product.filter((item) => item.name.toLowerCase().includes(q.toLowerCase()))
+    return products.filter((item) => item.name.toLowerCase().includes(q.toLowerCase()))
 
 }
 
 export function getProductById(id: string) {
-    product.find((item) => {
+    products.find((item) => {
         if (item.id === id) {
             return console.table(item)
         }
     })
 }
 
-export const purchase: TPurchase[] = [
+export const purchases: TPurchases[] = [
     {
         userId: "Daniel",
         productId: "0202",
@@ -85,14 +85,14 @@ export const purchase: TPurchase[] = [
 
 export function createPurchase(userId: string, productId: string, quantity: number, totalPrice: number): string {
 
-    purchase.push({ userId, productId, quantity, totalPrice })
+    purchases.push({ userId, productId, quantity, totalPrice })
 
     return "Compra realizada com sucesso"
 }
 
-export function getAllPurchasesFromUserId(userIdToSearch: string): TPurchase[] {
+export function getAllPurchasesFromUserId(userIdToSearch: string): TPurchases[] {
 
-    return purchase.filter((item) => 
+    return purchases.filter((item) => 
 
         item.userId === userIdToSearch
     )
