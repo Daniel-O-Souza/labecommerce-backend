@@ -95,6 +95,47 @@ app.post("/users", (req: Request, res: Response) => {
 
 })
 
+// EDITAR USUÁRIO PELO ID
+
+app.put("/users/:id", (req: Request, res: Response) => {
+    const id: string = req.params.id
+
+    const newEmail: string | undefined = req.body.email
+    const newPassword: string | undefined = req.body.password
+
+    const user: TUsers = users.find((item) => item.id === id)
+
+    if (user) {
+        user.email = newEmail || user.email
+        user.password = newPassword || user.password
+    }
+
+    console.log("depois", user)
+
+    res.status(201).send("Cadastro atualizado com sucesso")
+})
+
+// DELETAR USUÁRIO PELO ID
+
+app.delete("/users/:id", (req: Request, res: Response) => {
+    const id: string = req.params.id
+
+    const index: number = users.findIndex((item) => item.id === id)
+
+    let message: string
+
+    if (index >= 0) {
+        users.splice(index, 1)
+        message = "Usuário apagado com sucesso"
+    } else {
+        message = "Nenhum usuário encontrado"
+    }
+
+    console.log(users)
+
+    res.status(200).send(message)
+})
+
 // CRIANDO PRODUTO
 
 app.post("/products", (req: Request, res: Response) => {
@@ -116,6 +157,60 @@ app.post("/products", (req: Request, res: Response) => {
 
 })
 
+// EDITAR PRODUTO PELO ID
+
+app.put("/products/:id", (req: Request, res: Response) => {
+    const id: string = req.params.id
+
+    const newName: string | undefined = req.body.name
+    const newPrice: number | undefined = req.body.price
+    const newCategory: CATEGORY | undefined = req.body.category
+
+    const product: TProducts = products.find((item) => item.id === id)
+
+    if (product) {
+        product.name = newName || product.name
+        product.price = isNaN(newPrice) ? product.price : newPrice
+        product.category = newCategory || product.category
+    }
+
+    console.log("depois", product)
+
+    res.status(201).send("Produto atualizado com sucesso")
+})
+
+// DELETAR PRODUTO POR ID
+
+app.delete("/products/:id", (req: Request, res: Response) => {
+    const id: string = req.params.id
+
+    const index: number = products.findIndex((item) => item.id === id)
+
+    let message: string
+
+    if (index >= 0) {
+        products.splice(index, 1)
+        message = "Produto deletado com sucesso"
+    } else {
+        message = "Nenhum produto encontrado"
+    }
+
+    console.log(products)
+
+    res.status(200).send(message)
+})
+
+
+// BUSCANDO PRODUTO POR ID
+
+app.get("/products/:id", (req: Request, res: Response) => {
+    const id: string = req.params.id
+
+    const result: TProducts = products.find((item) => item.id === id)
+
+    res.status(200).send(result)
+})
+
 // CRIANDO COMPRA
 
 app.post("/purchases", (req: Request, res: Response) => {
@@ -135,4 +230,14 @@ app.post("/purchases", (req: Request, res: Response) => {
 
     res.status(201).send("Compra realizada com sucesso")
 
+})
+
+// BUSCAR COMPRAS DO USUÁRIO PELO ID
+
+app.get("/users/:id/purchases", (req: Request, res: Response) => {
+    const id: string = req.params.id
+
+    const result: TPurchases = purchases.find((item) => item.userId === id)
+
+    res.status(200).send(result)
 })
