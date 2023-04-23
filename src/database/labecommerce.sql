@@ -194,3 +194,31 @@ WHERE id = "pur0004";
 -- SIMULANDO HISTÓRICO DE COMPRAS DE DETERMINADO USUÁRIO
 
 SELECT * from purchases WHERE buyer_id = "u002";
+
+-- CRIANDO TABELA DE RELAÇÕES
+
+CREATE TABLE
+    purchases_products (
+        purchase_id TEXT NOT NULL,
+        product_id TEXT NOT NULL,
+        quantity INTEGER NOT NULL,
+        FOREIGN KEY(purchase_id) REFERENCES purchases(id),
+        FOREIGN KEY(product_id) REFERENCES products(id)
+    );
+
+-- POVOANDO TABELA DE RELAÇÕES
+
+INSERT INTO
+    purchases_products (
+        purchase_id,
+        product_id,
+        quantity
+    )
+VALUES ("pur0001", "prod0002", 2), ("pur0002", "prod0004", 3), ("pur0003", "prod0003", 1), ("pur0004", "prod0005", 3);
+
+-- JUNÇÃO DAS TABELAS RELACIONADAS
+
+SELECT *
+FROM purchases_products
+    INNER JOIN purchases ON purchases_products.purchase_id = purchases.id
+    INNER JOIN products ON purchases_products.product_id = products.id;
