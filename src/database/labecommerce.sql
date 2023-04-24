@@ -1,71 +1,181 @@
--- Active: 1682273795400@@127.0.0.1@3306
+-- Active: 1682278723466@@127.0.0.1@3306
 
 -- CRIANDO TABELA USERS
+
+-- CREATE TABLE
+
+--     users (
+
+--         id TEXT PRIMARY KEY NOT NULL UNIQUE,
+
+--         email TEXT UNIQUE NOT NULL,
+
+--         password TEXT NOT NULL
+
+--     );
+
+-- DROP TABLE users;
 
 CREATE TABLE
     users (
         id TEXT PRIMARY KEY NOT NULL UNIQUE,
+        name TEXT NOT NULL,
         email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+        createdAt TEXT
     );
 
 --POVOANDO TABELA USERS
 
 INSERT INTO
-    users (id, email, password)
+    users (
+        id,
+        name,
+        email,
+        password,
+        createdAt
+    )
 VALUES (
         "u001",
+        "Daniel",
         "daniel@email.com",
-        "568741"
+        "568741",
+        CURRENT_TIMESTAMP
     ), (
         "u002",
-        "marias@email.com",
-        "458763"
+        "Maria",
+        "maria@email.com",
+        "458763",
+        CURRENT_TIMESTAMP
     ), (
-        "u003",
-        "joao@email.com",
-        "457236"
+        "u004",
+        "Lucas",
+        "lucas@email.com",
+        "241578",
+        CURRENT_TIMESTAMP
+    ), (
+        "u005",
+        "Beatriz",
+        "beatriz@email.com",
+        "695214",
+        CURRENT_TIMESTAMP
+    ), (
+        "u006",
+        "Marcos",
+        "marcos@email.com",
+        "987456",
+        CURRENT_TIMESTAMP
+    ), (
+        "u007",
+        "Ana",
+        "ana@email.com",
+        "695712",
+        CURRENT_TIMESTAMP
+    ), (
+        "u008",
+        "Marcia",
+        "marcia@email.com",
+        "367459",
+        CURRENT_TIMESTAMP
     );
 
 --CRIANDO TABELA PRODUCTS
+
+-- CREATE TABLE
+
+--     products (
+
+--         id TEXT PRIMARY KEY UNIQUE NOT NULL,
+
+--         name TEXT NOT NULL,
+
+--         price REAL NOT NULL,
+
+--         category TEXT NOT NULL
+
+--     );
+
+-- DROP TABLE products;
 
 CREATE TABLE
     products (
         id TEXT PRIMARY KEY UNIQUE NOT NULL,
         name TEXT NOT NULL,
         price REAL NOT NULL,
-        category TEXT NOT NULL
+        description TEXT NOT NULL,
+        imageUrl TEXT NOT NULL
     );
 
 -- POVOANDO TABELA PRODUCTS
 
 INSERT INTO
-    products (id, name, price, category)
+    products (
+        id,
+        name,
+        price,
+        description,
+        imageUrl
+    )
 VALUES (
         "prod0001",
         "Geladeira",
         2000,
-        "Eletrônicos"
+        "Geladeira duplex Electrolux",
+        "https://picsum.photos/200"
     ), (
         "prod0002",
         "Pulseira",
-        50,
-        "Acessórios"
+        300,
+        "Pulseira de prata",
+        "https://picsum.photos/200"
     ), (
         "prod0003",
         "Camiseta",
-        60,
-        "Roupas e calçados"
+        100,
+        "Camiseta da banda Iron Maiden",
+        "https://picsum.photos/200"
     ), (
         "prod0004",
         "playstation 5",
-        3500,
-        "Eletrônicos"
+        400,
+        "Console para jogos modernos",
+        "https://picsum.photos/200"
     ), (
         "prod0005",
-        "Sapato",
-        150,
-        "Roupas e calçados"
+        "Televisão",
+        2500,
+        "Tv 50 com tela de polegadas marca TCL",
+        "https://picsum.photos/200"
+    ), (
+        "prod0006",
+        "Óculos de sol",
+        500,
+        "Óculos de sol da marca Ray Ban",
+        "https://picsum.photos/200"
+    ), (
+        "prod0007",
+        "Tênis",
+        800,
+        "Tênis da marca nike",
+        "https://picsum.photos/200"
+    ), (
+        "prod0008",
+        "Calça",
+        80,
+        "Calça de moletom",
+        "https://picsum.photos/200"
+    ), (
+        "prod0009",
+        "Bicicleta",
+        1500,
+        "Bicicleta da marca GTSM1",
+        "https://picsum.photos/200"
+    ), (
+        "prod00010",
+        "Colar",
+        3500,
+        "Colar de ouro e diamantes",
+        "https://picsum.photos/200"
     );
 
 -- RETORNAR TODOS OS USUÁRIOS CADASTRADOS
@@ -147,14 +257,27 @@ ORDER BY price ASC;
 
 -- CRIANDO TABELA DE COMPRAS
 
+-- CREATE TABLE
+
+--     purchases (
+--         id TEXT PRIMARY KEY UNIQUE NOT NULL,
+--         total_price REAL NOT NULL,
+--         paid INTEGER NOT NULL,
+--         delivered_at TEXT,
+--         buyer_id TEXT NOT NULL,
+--         FOREIGN KEY(buyer_id) REFERENCES users(id)
+--     );
+
+-- DROP TABLE purchases;
+
 CREATE TABLE
     purchases (
         id TEXT PRIMARY KEY UNIQUE NOT NULL,
-        total_price REAL NOT NULL,
+        buyer TEXT NOT NULL,
+        totalPrice REAL NOT NULL,
         paid INTEGER NOT NULL,
-        delivered_at TEXT,
-        buyer_id TEXT NOT NULL,
-        FOREIGN KEY(buyer_id) REFERENCES users(id)
+        created_at TEXT,
+        FOREIGN KEY(buyer) REFERENCES users(id)
     );
 
 -- POPULANDO TABELA DE PEDIDOS
@@ -162,13 +285,74 @@ CREATE TABLE
 INSERT INTO
     purchases (
         id,
-        total_price,
+        buyer,
+        totalPrice,
         paid,
-        delivered_at,
-        buyer_id
+        created_at
     )
-VALUES ("pur0001", 6000, 0, NULL, "u002"), ("pur0002", 300, 1, NULL, "u002"), ("pur0003", 400, 0, NULL, "u003"), ("pur0004", 3000, 1, NULL, "u003");
+VALUES (
+        "pur0001",
+        "u001",
+        3000,
+        0,
+        CURRENT_TIMESTAMP
+    ), (
+        "pur0002",
+        "u001",
+        400,
+        0,
+        CURRENT_TIMESTAMP
+    ), (
+        "pur0003",
+        "u003",
+        600,
+        0,
+        CURRENT_TIMESTAMP
+    ), (
+        "pur0004",
+        "u005",
+        800,
+        0,
+        CURRENT_TIMESTAMP
+    ), (
+        "pur0005",
+        "u004",
+        5000,
+        0,
+        CURRENT_TIMESTAMP
+    ), (
+        "pur0006",
+        "u004",
+        3500,
+        0,
+        CURRENT_TIMESTAMP
+    ), (
+        "pur0007",
+        "u002",
+        600,
+        0,
+        CURRENT_TIMESTAMP
+    ), (
+        "pur0008",
+        "u007",
+        7500,
+        0,
+        CURRENT_TIMESTAMP
+    ), (
+        "pur0009",
+        "u006",
+        2500,
+        0,
+        CURRENT_TIMESTAMP
+    ), (
+        "pur0010",
+        "u002",
+        5000,
+        0,
+        CURRENT_TIMESTAMP
+    );
 
+SELECT * FROM purchases;
 -- EDITANDO STATUS DA DATA DE ENTREGA DOS PEDIDOS
 
 UPDATE purchases
