@@ -52,8 +52,12 @@ app.get('/ping', (req: Request, res: Response) => {
 app.get("/users", async (req: Request, res: Response) => {
 
     try {
-        const result = await db.raw(`SELECT * FROM users;`)
+
+        // const result = await db.raw(`SELECT * FROM users;`)
+
+        const result = await db.select("*").from("users")
         res.status(200).send({ result })
+
     } catch (error: any) {
         res.status(400).send(error.message)
     }
@@ -200,36 +204,42 @@ app.put("/users/:id", async (req: Request, res: Response) => {
 
 // DELETAR USUÁRIO PELO ID ###############################################################################
 
-app.delete("/users/:id", (req: Request, res: Response) => {
+app.delete("/users/:id", async (req: Request, res: Response) => {
 
     try {
 
-        const id: string = req.params.id
+        const idToDelete: string = req.params.id
 
-        const index: number = users.findIndex((item) => item.id === id)
+        // const index: number = users.findIndex((item) => item.id === id)
 
-        let message: string
+        // let message: string
 
-        const deleteUser = users.find((user) => user.id === id)
+        // const deleteUser = users.find((user) => user.id === id)
 
-        if (!deleteUser) {
+        const [user] = await db.select("*").from("users").where({ id: idToDelete })
+
+        if (!user) {
             res.status(400)
             throw new Error("O id de usuário informado não existe, digite um id cadastrado")
         }
 
-        if (index >= 0) {
-            users.splice(index, 1)
-            message = "Usuário apagado com sucesso"
-        } else {
-            message = "Nenhum usuário encontrado"
-        }
+        // if (index >= 0) {
+        //     users.splice(index, 1)
+        //     message = "Usuário apagado com sucesso"
+        // } else {
+        //     message = "Nenhum usuário encontrado"
+        // }
 
-        console.log(users)
+        // console.log(users)
 
-        res.status(200).send(message)
+        // res.status(200).send(message)
+
+        await db("users").del().where({ id: idToDelete })
+
+        res.status(200).send({ message: "User deletado com sucesso" })
 
     } catch (error) {
-        res.send(error.message)
+        res.status(400).send(error.message)
     }
 })
 
@@ -335,35 +345,42 @@ app.put("/products/:id", async (req: Request, res: Response) => {
 
 // DELETAR PRODUTO POR ID ###############################################################################
 
-app.delete("/products/:id", (req: Request, res: Response) => {
+app.delete("/products/:id", async (req: Request, res: Response) => {
 
     try {
-        const id: string = req.params.id
+        const idToDelete: string = req.params.id
 
-        const index: number = products.findIndex((item) => item.id === id)
+        // const index: number = products.findIndex((item) => item.id === id)
 
-        let message: string
+        // let message: string
 
-        const product = products.find((product) => product.id === id)
+        // const product = products.find((product) => product.id === id)
+
+        const [product] = await db("products").where({ id: idToDelete })
+
 
         if (!product) {
             res.status(400)
             throw new Error("O id do produto informado não existe, digite um id cadastrado")
         }
 
-        if (index >= 0) {
-            products.splice(index, 1)
-            message = "Produto deletado com sucesso"
-        } else {
-            message = "Nenhum produto encontrado"
-        }
+        // if (index >= 0) {
+        //     products.splice(index, 1)
+        //     message = "Produto deletado com sucesso"
+        // } else {
+        //     message = "Nenhum produto encontrado"
+        // }
 
-        console.log(products)
+        // console.log(products)
 
-        res.status(200).send(message)
+        // res.status(200).send(message)
 
-    } catch (error) {
-        res.send(error.message)
+        await db("products").del().where({ id: idToDelete })
+
+        res.status(200).send({ message: "Produto deletado com sucesso" })
+
+    } catch (error: any) {
+        res.status(400).send(error.message)
     }
 })
 
@@ -441,6 +458,29 @@ app.post("/purchases", async (req: Request, res: Response) => {
         res.status(400).send(error.message)
     }
 
+})
+
+// BUSCANDO COMPRA PELO ID
+
+app.get("/purchases/:id", async (req: Request, res: Response) => {
+
+    try {
+
+        const id: string = req.body.id
+
+        const result = await db("purchases")
+            .select()
+            .innerJoin(
+                "users",
+                `purchases.buyer`,
+                "=",
+                `users.id`
+            )
+
+        res.status(200).send(result)
+    } catch (error: any) {
+        res.status(400).send(error.message)
+    }
 })
 
 // BUSCAR COMPRAS PELO ID DO USUÁRIO ###############################################################################
