@@ -52,8 +52,12 @@ app.get('/ping', (req: Request, res: Response) => {
 app.get("/users", async (req: Request, res: Response) => {
 
     try {
-        const result = await db.raw(`SELECT * FROM users;`)
+
+        // const result = await db.raw(`SELECT * FROM users;`)
+
+        const result = await db.select("*").from("users")
         res.status(200).send({ result })
+
     } catch (error: any) {
         res.status(400).send(error.message)
     }
@@ -153,18 +157,25 @@ app.post("/users", async (req: Request, res: Response) => {
 
 // EDITAR USUÁRIO PELO ID ###############################################################################
 
-app.put("/users/:id", (req: Request, res: Response) => {
+app.put("/users/:id", async (req: Request, res: Response) => {
 
     try {
 
         const id: string = req.params.id
+        const newName: string | undefined = req.body.name
         const newEmail: string | undefined = req.body.email
         const newPassword: string | undefined = req.body.password
-        const user: TUsers = users.find((item) => item.id === id)
+        const newCreatedAt: string | undefined = req.body.createdAt
+
+        const [user]: {}[] = await db.raw(`SELECT * FROM users WHERE ID = '${id}';`)
 
         if (!user) {
+            throw new Error("Id de usuário não existe no banco de dados")
+        }
+
+        if (typeof newName !== "string") {
             res.status(400)
-            throw new Error("O id do usuário digitado não existe, digite o id de um usuário cadastrado")
+            throw new Error("O nome deve ser do tipo string")
         }
 
         if (typeof newEmail !== "string") {
@@ -177,53 +188,58 @@ app.put("/users/:id", (req: Request, res: Response) => {
             throw new Error("O password deve ser do tipo string")
         }
 
-        if (user) {
-            user.email = newEmail || user.email
-            user.password = newPassword || user.password
+        if (typeof newCreatedAt !== "string") {
+            res.status(400)
+            throw new Error("A nova data de criação deve ser do tipo string")
         }
 
-        console.log("depois", user)
+        const updateUser: TUsers = await db.raw(`UPDATE users SET name = '${newName}', email = '${newEmail}', password = '${newPassword}', createdAt = '${newCreatedAt}' WHERE id = '${id}'`)
+        res.status(201).send("Usuário alterado com sucesso.")
 
-        res.status(201).send("Cadastro atualizado com sucesso")
-
-    } catch (error) {
-        res.send(error.message)
+    } catch (error: any) {
+        res.status(400).send(error.message)
     }
 
 })
 
 // DELETAR USUÁRIO PELO ID ###############################################################################
 
-app.delete("/users/:id", (req: Request, res: Response) => {
+app.delete("/users/:id", async (req: Request, res: Response) => {
 
     try {
 
-        const id: string = req.params.id
+        const idToDelete: string = req.params.id
 
-        const index: number = users.findIndex((item) => item.id === id)
+        // const index: number = users.findIndex((item) => item.id === id)
 
-        let message: string
+        // let message: string
 
-        const deleteUser = users.find((user) => user.id === id)
+        // const deleteUser = users.find((user) => user.id === id)
 
-        if (!deleteUser) {
+        const [user] = await db.select("*").from("users").where({ id: idToDelete })
+
+        if (!user) {
             res.status(400)
             throw new Error("O id de usuário informado não existe, digite um id cadastrado")
         }
 
-        if (index >= 0) {
-            users.splice(index, 1)
-            message = "Usuário apagado com sucesso"
-        } else {
-            message = "Nenhum usuário encontrado"
-        }
+        // if (index >= 0) {
+        //     users.splice(index, 1)
+        //     message = "Usuário apagado com sucesso"
+        // } else {
+        //     message = "Nenhum usuário encontrado"
+        // }
 
-        console.log(users)
+        // console.log(users)
 
-        res.status(200).send(message)
+        // res.status(200).send(message)
+
+        await db("users").del().where({ id: idToDelete })
+
+        res.status(200).send({ message: "User deletado com sucesso" })
 
     } catch (error) {
-        res.send(error.message)
+        res.status(400).send(error.message)
     }
 })
 
@@ -281,83 +297,90 @@ app.post("/products", async (req: Request, res: Response) => {
 
 // EDITAR PRODUTO PELO ID ###############################################################################
 
-// app.put("/products/:id", (req: Request, res: Response) => {
-
-//     try {
-//         const id: string = req.params.id
-
-//         const newName: string | undefined = req.body.name
-//         const newPrice: number | undefined = req.body.price
-//         const newCategory: CATEGORY | undefined = req.body.category
-
-//         const product: TProducts = products.find((item) => item.id === id)
-
-//         if (!product) {
-//             res.status(400)
-//             throw new Error("O id do produto digitado não existe, digite o id de um produto cadastrado")
-//         }
-
-//         if (typeof newName !== "string") {
-//             res.status(400)
-//             throw new Error("O nome do produto deve ser do tipo string")
-//         }
-
-//         if (typeof newPrice !== "number") {
-//             res.status(400)
-//             throw new Error("O preço do produto deve ser do tipo number")
-//         }
-
-//         if (typeof newCategory !== "string") {
-//             res.status(400)
-//             throw new Error("A categoria do do produto deve ser do tipo string")
-//         }
-
-//         if (product) {
-//             product.name = newName || product.name
-//             product.price = isNaN(newPrice) ? product.price : newPrice
-//             product.category = newCategory || product.category
-//         }
-
-//         console.log("depois", product)
-
-//         res.status(201).send("Produto atualizado com sucesso")
-//     } catch (error) {
-//         res.send(error.message)
-//     }
-
-// })
-
-// DELETAR PRODUTO POR ID ###############################################################################
-
-app.delete("/products/:id", (req: Request, res: Response) => {
+app.put("/products/:id", async (req: Request, res: Response) => {
 
     try {
         const id: string = req.params.id
 
-        const index: number = products.findIndex((item) => item.id === id)
+        const newName: string | undefined = req.body.name
+        const newPrice: number | undefined = req.body.price
+        const newDescription: string | undefined = req.body.description
+        const newImageUrl: string | undefined = req.body.ImageUrl
 
-        let message: string
+        const [product]: {}[] = await db.raw(`SELECT * FROM products WHERE ID = '${id}';`)
 
-        const product = products.find((product) => product.id === id)
+        if (!product) {
+            res.status(400)
+            throw new Error("O id do produto digitado não existe, digite o id de um produto cadastrado")
+        }
+
+        if (typeof newName !== "string") {
+            res.status(400)
+            throw new Error("O nome do produto deve ser do tipo string")
+        }
+
+        if (typeof newPrice !== "number") {
+            res.status(400)
+            throw new Error("O preço do produto deve ser do tipo number")
+        }
+
+        if (typeof newDescription !== "string") {
+            res.status(400)
+            throw new Error("A descrição do produto deve ser do tipo string")
+        }
+
+        if (typeof newImageUrl !== "string") {
+            res.status(400)
+            throw new Error("A Url da imagem do produto deve ser do tipo string")
+        }
+
+        const updateProduct: TProducts = await db.raw(`UPDATE products SET name = '${newName}', price = '${newPrice}', description = '${newDescription}', imageUrl = '${newImageUrl}' WHERE id = '${id}'`)
+        res.status(201).send("Produto alterado com sucesso.")
+
+    } catch (error: any) {
+        res.status(400).send(error.message)
+    }
+
+})
+
+// DELETAR PRODUTO POR ID ###############################################################################
+
+app.delete("/products/:id", async (req: Request, res: Response) => {
+
+    try {
+        const idToDelete: string = req.params.id
+
+        // const index: number = products.findIndex((item) => item.id === id)
+
+        // let message: string
+
+        // const product = products.find((product) => product.id === id)
+
+        const [product] = await db("products").where({ id: idToDelete })
+
 
         if (!product) {
             res.status(400)
             throw new Error("O id do produto informado não existe, digite um id cadastrado")
         }
 
-        if (index >= 0) {
-            products.splice(index, 1)
-            message = "Produto deletado com sucesso"
-        } else {
-            message = "Nenhum produto encontrado"
-        }
+        // if (index >= 0) {
+        //     products.splice(index, 1)
+        //     message = "Produto deletado com sucesso"
+        // } else {
+        //     message = "Nenhum produto encontrado"
+        // }
 
-        console.log(products)
+        // console.log(products)
 
-        res.status(200).send(message)
+        // res.status(200).send(message)
 
-    } catch (error) {
-        res.send(error.message)
+        await db("products").del().where({ id: idToDelete })
+
+        res.status(200).send({ message: "Produto deletado com sucesso" })
+
+    } catch (error: any) {
+        res.status(400).send(error.message)
     }
 })
 
@@ -435,6 +458,29 @@ app.post("/purchases", async (req: Request, res: Response) => {
         res.status(400).send(error.message)
     }
 
+})
+
+// BUSCANDO COMPRA PELO ID
+
+app.get("/purchases/:id", async (req: Request, res: Response) => {
+
+    try {
+
+        const id: string = req.body.id
+
+        const result = await db("purchases")
+            .select()
+            .innerJoin(
+                "users",
+                `purchases.buyer`,
+                "=",
+                `users.id`
+            )
+
+        res.status(200).send(result)
+    } catch (error: any) {
+        res.status(400).send(error.message)
+    }
 })
 
 // BUSCAR COMPRAS PELO ID DO USUÁRIO ###############################################################################
