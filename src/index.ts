@@ -153,18 +153,25 @@ app.post("/users", async (req: Request, res: Response) => {
 
 // EDITAR USUÁRIO PELO ID ###############################################################################
 
-app.put("/users/:id", (req: Request, res: Response) => {
+app.put("/users/:id", async (req: Request, res: Response) => {
 
     try {
 
         const id: string = req.params.id
+        const newName: string | undefined = req.body.name
         const newEmail: string | undefined = req.body.email
         const newPassword: string | undefined = req.body.password
-        const user: TUsers = users.find((item) => item.id === id)
+        const newCreatedAt: string | undefined = req.body.createdAt
+
+        const [user]: {}[] = await db.raw(`SELECT * FROM users WHERE ID = '${id}';`)
 
         if (!user) {
+            throw new Error("Id de usuário não existe no banco de dados")
+        }
+
+        if (typeof newName !== "string") {
             res.status(400)
-            throw new Error("O id do usuário digitado não existe, digite o id de um usuário cadastrado")
+            throw new Error("O nome deve ser do tipo string")
         }
 
         if (typeof newEmail !== "string") {
@@ -177,17 +184,16 @@ app.put("/users/:id", (req: Request, res: Response) => {
             throw new Error("O password deve ser do tipo string")
         }
 
-        if (user) {
-            user.email = newEmail || user.email
-            user.password = newPassword || user.password
+        if (typeof newCreatedAt !== "string") {
+            res.status(400)
+            throw new Error("A nova data de criação deve ser do tipo string")
         }
 
-        console.log("depois", user)
+        const updateUser: TUsers = await db.raw(`UPDATE users SET name = '${newName}', email = '${newEmail}', password = '${newPassword}', createdAt = '${newCreatedAt}' WHERE id = '${id}'`)
+        res.status(201).send("Usuário alterado com sucesso.")
 
-        res.status(201).send("Cadastro atualizado com sucesso")
-
-    } catch (error) {
-        res.send(error.message)
+    } catch (error: any) {
+        res.status(400).send(error.message)
     }
 
 })
@@ -281,51 +287,51 @@ app.post("/products", async (req: Request, res: Response) => {
 
 // EDITAR PRODUTO PELO ID ###############################################################################
 
-// app.put("/products/:id", (req: Request, res: Response) => {
+app.put("/products/:id", async (req: Request, res: Response) => {
 
-//     try {
-//         const id: string = req.params.id
+    try {
+        const id: string = req.params.id
 
-//         const newName: string | undefined = req.body.name
-//         const newPrice: number | undefined = req.body.price
-//         const newCategory: CATEGORY | undefined = req.body.category
+        const newName: string | undefined = req.body.name
+        const newPrice: number | undefined = req.body.price
+        const newDescription: string | undefined = req.body.description
+        const newImageUrl: string | undefined = req.body.ImageUrl
 
-//         const product: TProducts = products.find((item) => item.id === id)
+        const [product]: {}[] = await db.raw(`SELECT * FROM products WHERE ID = '${id}';`)
 
-//         if (!product) {
-//             res.status(400)
-//             throw new Error("O id do produto digitado não existe, digite o id de um produto cadastrado")
-//         }
+        if (!product) {
+            res.status(400)
+            throw new Error("O id do produto digitado não existe, digite o id de um produto cadastrado")
+        }
 
-//         if (typeof newName !== "string") {
-//             res.status(400)
-//             throw new Error("O nome do produto deve ser do tipo string")
-//         }
+        if (typeof newName !== "string") {
+            res.status(400)
+            throw new Error("O nome do produto deve ser do tipo string")
+        }
 
-//         if (typeof newPrice !== "number") {
-//             res.status(400)
-//             throw new Error("O preço do produto deve ser do tipo number")
-//         }
+        if (typeof newPrice !== "number") {
+            res.status(400)
+            throw new Error("O preço do produto deve ser do tipo number")
+        }
 
-//         if (typeof newCategory !== "string") {
-//             res.status(400)
-//             throw new Error("A categoria do do produto deve ser do tipo string")
-//         }
+        if (typeof newDescription !== "string") {
+            res.status(400)
+            throw new Error("A descrição do produto deve ser do tipo string")
+        }
 
-//         if (product) {
-//             product.name = newName || product.name
-//             product.price = isNaN(newPrice) ? product.price : newPrice
-//             product.category = newCategory || product.category
-//         }
+        if (typeof newImageUrl !== "string") {
+            res.status(400)
+            throw new Error("A Url da imagem do produto deve ser do tipo string")
+        }
 
-//         console.log("depois", product)
+        const updateProduct: TProducts = await db.raw(`UPDATE products SET name = '${newName}', price = '${newPrice}', description = '${newDescription}', imageUrl = '${newImageUrl}' WHERE id = '${id}'`)
+        res.status(201).send("Produto alterado com sucesso.")
 
-//         res.status(201).send("Produto atualizado com sucesso")
-//     } catch (error) {
-//         res.send(error.message)
-//     }
+    } catch (error: any) {
+        res.status(400).send(error.message)
+    }
 
-// })
+})
 
 // DELETAR PRODUTO POR ID ###############################################################################
 
